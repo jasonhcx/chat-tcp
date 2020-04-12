@@ -14,11 +14,10 @@ void* responde_cliente(void* param) {
 	
 	while(1) {
 		bzero(msg, 100); // inicializa a mensagem com 0
-                read(client_fd, msg, 100); // le mensagem do socket cliente associado
-                printf("Recebi do cliente: %s\n",msg); // exibe o que recebeu do cliente
-                write(client_fd, msg, strlen(msg)+1); // envia de volta a mesma mensgem
+        read(client_fd, msg, 100); // le mensagem do socket cliente associado
+        printf("%s\n",msg); // exibe o que recebeu do cliente
+        write(client_fd, msg, strlen(msg)+1); // envia de volta a mesma mensgem
 	}
-
 }
 
 
@@ -58,7 +57,7 @@ int main(int argc, char ** argv) {
 
 	listen(listen_fd, 10); // sinaliza que aguardara conexoes na porta associada
 
-	printf("Inicilizando bate-papo %s na porta %d...\n", servername, server_port);
+	printf("Inicilizando bate-papo %s na porta %d...\n", server_name, server_port);
 
 	while (1) {
 		client_fd = accept(listen_fd, (struct sockaddr*) NULL, NULL); // funcao bloqueante, gera novo socket 

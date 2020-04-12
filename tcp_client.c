@@ -4,13 +4,17 @@
 #include <netdb.h>
 #include <string.h>
 
-int main(void) {
+int main(int argc, char** argv) {
 
 	int client_fd; // file descriptor do socket do cliente
 
-	int port = 22000;
+	int port = argv[2];´
+	
+	int client_name[100];
+    
+    strcpy(client_name, argv[3]);
 
-	char *host = "127.0.0.1"; 
+	char *host = argv[1];
 
 	char send_msg[100]; // string com mensagem a enviar
 	char recv_msg[100]; // string com mensagem a receber
@@ -39,7 +43,7 @@ int main(void) {
 		write(client_fd, send_msg, strlen(send_msg)+1);
 		read(client_fd, recv_msg, 100); // le do servidor string para exibir para o usuario
 
-		printf("Recebi do servidor: %s\n", recv_msg); // exibe o recebido na tela
+		printf("%s\n", recv_msg); // exibe o recebido na tela
 
 	}	
 
