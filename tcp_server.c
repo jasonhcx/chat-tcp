@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <arpa/inet.h>
 #include <netdb.h>
 #include <string.h>
 #include <pthread.h>
@@ -9,13 +10,14 @@
 typedef struct{
     int client_fd;
     char name[40];
-    char ip[40];
+    char * ip;
 }cliente;
 
 void* responde_cliente(void* param);
 
 char server_name[100];
 cliente clientes[10];
+
 
 int main(int argc, char ** argv) {
 
@@ -54,8 +56,9 @@ int main(int argc, char ** argv) {
 
 	while (1) {
         
-		clientes[i].client_fd = accept(listen_fd, (struct sockaddr*) NULL, NULL); // funcao bloqueante, gera novo socket 
-		pthread_create(&threads[thread_count++], NULL, (void*) responde_cliente, (void*) i);
+		clientes[i].client_fd = accept(listen_fd, (struct sockaddr*) NULL, NULL); // funcao bloqueante, gera novo socket
+        clientes[i].ip = inet_ntoa(client_addr.sin_addr);
+		pthread_create(&threads[thread_count++], NULL, (void*) responde_cliente, (void*) i++);
 	}
 
 	return 0;
@@ -69,8 +72,8 @@ void* responde_cliente(void* param) {
     int x = 0;
     
     read(client_aux, msg, 40);
-    strcpy(clientes[(int)param].name, msg);
-    printf("%s se conectou\n", clientes[(int)param].name);
+    strcpy(clientes[(int) param].name, msg);
+    printf("%s se conectou com o ip %s\n", clientes[(int)param].name, clientes[(int)param].ip);
     write(client_aux, server_name, strlen(server_name)+1);
     
     
