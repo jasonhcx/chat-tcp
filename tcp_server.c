@@ -61,8 +61,8 @@ void* responde_cliente(void* param) {
     
     char client_name[40];
     read(client_fd, msg, 40);
-    printf("
     write(client_fd, server_name, strlen(server_name)+1);
+    printf("%s\n", inet_ntoa(client_addr.sin_addr));
     
 	
 	while(1) {
