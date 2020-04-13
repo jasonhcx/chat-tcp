@@ -8,7 +8,7 @@ int main(int argc, char** argv) {
 
 	int client_fd; // file descriptor do socket do cliente
 
-	int port = argv[2];
+	int port = atoi(argv[2]);
 	
 	int client_name[40];
     
@@ -33,18 +33,27 @@ int main(int argc, char** argv) {
 	printf("Conectando-se ao servidor %s na porta %d\n", host, port);
 
 	connect(client_fd, (struct sockaddr*) &server_addr, sizeof(server_addr)); // funcao bloqueante, conecta ao servidor
+    
+    bzero( send_msg, 140);
+    bzero( recv_msg, 100);
+    strcpy(send_msg, client_name);
+    write(client_fd, send_msg, strlen(send_msg)+1);
+    printf("Apelido: %s\n", client_name);
+    read(client_fd, recv_msg, 140);
+    printf("Mensagem do servidor: %s\n", recv_msg);
 
 	while(1) {
-		bzero( send_msg, 100);
+		bzero( send_msg, 140);
 		bzero( recv_msg, 100);
 		
 		printf("Digite sua mensagem: ");
 		fgets(msg, 100, stdin); //le do usuario string para enviar ao servidor
         strcat(send_msg, client_name);
+        strcat(send_msg, " ");
         strcat(send_msg, msg);
 		write(client_fd, send_msg, strlen(send_msg)+1);
         
-		read(client_fd, recv_msg, 100); // le do servidor string para exibir para o usuario
+		read(client_fd, recv_msg, 140); // le do servidor string para exibir para o usuario
 
 		printf("%s\n", recv_msg); // exibe o recebido na tela
 

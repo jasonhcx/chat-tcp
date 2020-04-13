@@ -6,30 +6,16 @@
 #include <pthread.h>
 #include <string.h>
 
-void* responde_cliente(void* param) {
+void* responde_cliente(void* param);
 
-	int client_fd = (int) param;
+char server_name[100];
 
-	char msg[100];
-	
-	while(1) {
-		bzero(msg, 100); // inicializa a mensagem com 0
-        read(client_fd, msg, 100); // le mensagem do socket cliente associado
-        printf("%s\n",msg); // exibe o que recebeu do cliente
-        write(client_fd, msg, strlen(msg)+1); // envia de volta a mesma mensgem
-	}
-}
-
-
-/* Um servidor de eco. Tudo que este servidor receber de um cliente, ele enviara de volta */
 
 int main(int argc, char ** argv) {
 
-	char msg[100];
+	char msg[140];
 
 	int server_port = atoi(argv[1]);
-    
-    char server_name[100];
     
     strcpy(server_name, argv[2]);
 
@@ -65,4 +51,25 @@ int main(int argc, char ** argv) {
 	}
 
 	return 0;
+}
+
+void* responde_cliente(void* param) {
+
+	int client_fd = (int) param;
+
+	char msg[140];
+    
+    char client_name[40];
+    read(client_fd, msg, 40);
+    printf("
+    write(client_fd, server_name, strlen(server_name)+1);
+    
+	
+	while(1) {
+		bzero(msg, 140); // inicializa a mensagem com 0
+        read(client_fd, msg, 140); // le mensagem do socket cliente associado
+        printf("%s\n",msg); // exibe o que recebeu do cliente
+        write(client_fd, msg, strlen(msg)+1); // envia de volta a mesma mensgem
+        
+	}
 }
