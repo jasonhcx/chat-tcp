@@ -6,10 +6,16 @@
 #include <pthread.h>
 #include <string.h>
 
+typedef struct{
+    int client_fd;
+    char name[40];
+    char ip[40];
+}cliente;
+
 void* responde_cliente(void* param);
 
 char server_name[100];
-int client_fd[10];
+cliente clientes[10];
 
 int main(int argc, char ** argv) {
 
@@ -48,8 +54,8 @@ int main(int argc, char ** argv) {
 
 	while (1) {
         int i = 0;
-		client_fd[i] = accept(listen_fd, (struct sockaddr*) NULL, NULL); // funcao bloqueante, gera novo socket 
-		pthread_create(&threads[thread_count++], NULL, (void*) responde_cliente, (void*) client_fd[i++]);
+		clientes[i].client_fd = accept(listen_fd, (struct sockaddr*) NULL, NULL); // funcao bloqueante, gera novo socket 
+		pthread_create(&threads[thread_count++], NULL, (void*) responde_cliente, (void*) clientes[i++].client_fd);
 	}
 
 	return 0;
@@ -57,25 +63,25 @@ int main(int argc, char ** argv) {
 
 void* responde_cliente(void* param) {
 
-	int client_fdl = (int) param;
+	int client_aux = (int) param;
 
 	char msg[140];
-    char client_name[40];
     int x = 0;
     
-    read(client_fdl, msg, 40);
-    write(client_fdl, server_name, strlen(server_name)+1);
+    read(client_aux, msg, 40);
+    printf("%s se conectou\n", msg);
+    write(client_aux, server_name, strlen(server_name)+1);
     
     
 	
 	while(1) {
 		bzero(msg, 140); // inicializa a mensagem com 0
-        read(client_fdl, msg, 140); // le mensagem do socket cliente associado
+        read(client_aux, msg, 140); // le mensagem do socket cliente associado
         printf("%s\n",msg); // exibe o que recebeu do cliente
         
         for(x = 0 ; x < 10; x++)
         {
-            write(client_fd[x], msg, strlen(msg)+1); // envia de volta a mesma mensgem
+            write(clientes[x].client_fd, msg, strlen(msg)+1); // envia a mensagem para todos os clientes
         }
 	}
 }

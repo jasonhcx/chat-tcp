@@ -36,6 +36,7 @@ int main(int argc, char** argv) {
     
     bzero( send_msg, 140);
     bzero( recv_msg, 100);
+    strcat(send_msg, client_name);
     write(client_fd, send_msg, strlen(send_msg)+1);
     printf("Apelido: %s\n", client_name);
     read(client_fd, recv_msg, 140);
@@ -48,12 +49,11 @@ int main(int argc, char** argv) {
 		printf("Digite sua mensagem: ");
 		fgets(msg, 100, stdin); //le do usuario string para enviar ao servidor
         strcat(send_msg, client_name);
-        strcat(send_msg, " ");
+        strcat(send_msg, ": ");
         strcat(send_msg, msg);
 		write(client_fd, send_msg, strlen(send_msg)+1);
         
 		read(client_fd, recv_msg, 140); // le do servidor string para exibir para o usuario
-
 		printf("%s\n", recv_msg); // exibe o recebido na tela
 
 	}	
