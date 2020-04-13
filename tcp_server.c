@@ -20,7 +20,7 @@ cliente clientes[10];
 int main(int argc, char ** argv) {
 
 	char msg[140];
-
+    int i = 0;
 	int server_port = atoi(argv[1]);
     
     strcpy(server_name, argv[2]);
@@ -53,9 +53,9 @@ int main(int argc, char ** argv) {
 	printf("Inicilizando bate-papo %s na porta %d...\n", server_name, server_port);
 
 	while (1) {
-        int i = 0;
+        
 		clientes[i].client_fd = accept(listen_fd, (struct sockaddr*) NULL, NULL); // funcao bloqueante, gera novo socket 
-		pthread_create(&threads[thread_count++], NULL, (void*) responde_cliente, (void*) clientes[i++].client_fd);
+		pthread_create(&threads[thread_count++], NULL, (void*) responde_cliente, (void*) i);
 	}
 
 	return 0;
@@ -63,13 +63,14 @@ int main(int argc, char ** argv) {
 
 void* responde_cliente(void* param) {
 
-	int client_aux = (int) param;
-
+	int client_aux = clientes[(int) param].client_fd;
+    
 	char msg[140];
     int x = 0;
     
     read(client_aux, msg, 40);
-    printf("%s se conectou\n", msg);
+    strcpy(clientes[(int)param].name, msg);
+    printf("%s se conectou\n", clientes[(int)param].name);
     write(client_aux, server_name, strlen(server_name)+1);
     
     
