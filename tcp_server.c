@@ -6,11 +6,11 @@
 #include <string.h>
 #include <pthread.h>
 #include <string.h>
+#include <netinet/in.h>
 
 typedef struct{
     int client_fd;
     char name[40];
-    char * ip;
 }cliente;
 
 void* responde_cliente(void* param);
@@ -57,7 +57,6 @@ int main(int argc, char ** argv) {
 	while (1) {
         
 		clientes[i].client_fd = accept(listen_fd, (struct sockaddr*) NULL, NULL); // funcao bloqueante, gera novo socket
-        clientes[i].ip = inet_ntoa(client_addr.sin_addr);
 		pthread_create(&threads[thread_count++], NULL, (void*) responde_cliente, (void*) i++);
 	}
 
@@ -67,25 +66,34 @@ int main(int argc, char ** argv) {
 void* responde_cliente(void* param) {
 
 	int client_aux = clientes[(int) param].client_fd;
+    int client_temp;
     
-	char msg[140];
+	char msg[100];
+    char replica[200];
     int x = 0;
     
     read(client_aux, msg, 40);
     strcpy(clientes[(int) param].name, msg);
-    printf("%s se conectou com o ip %s\n", clientes[(int)param].name, clientes[(int)param].ip);
+    printf("%s se conectou\n", clientes[(int)param].name);
     write(client_aux, server_name, strlen(server_name)+1);
     
     
 	
 	while(1) {
-		bzero(msg, 140); // inicializa a mensagem com 0
-        read(client_aux, msg, 140); // le mensagem do socket cliente associado
-        printf("%s\n",msg); // exibe o que recebeu do cliente
         
-        for(x = 0 ; x < 10; x++)
+		bzero(msg, 100); // inicializa a mensagem com 0
+        bzero(replica, 200);
+        read(client_aux, msg, 140); // le mensagem do socket cliente associado
+        printf("%s enviou uma mensagem: %s\n",  clientes[(int) param].name, msg); // exibe o que recebeu do cliente
+        
+        for(x = 0; x < 10; x++)
         {
-            write(clientes[x].client_fd, msg, strlen(msg)+1); // envia a mensagem para todos os clientes
+            
+            client_temp = clientes[x].client_fd;
+            strcat(replica, clientes[x].name);
+            strcat(replica, msg);
+            write(client_temp, replica, strlen(msg)+1);
+            bzero(replica, 200);
         }
-	}
+    }
 }
