@@ -9,7 +9,7 @@
 void* responde_cliente(void* param);
 
 char server_name[100];
-
+int client_fd[10];
 
 int main(int argc, char ** argv) {
 
@@ -19,8 +19,9 @@ int main(int argc, char ** argv) {
     
     strcpy(server_name, argv[2]);
 
-	int listen_fd, client_fd; // dois file descriptors, 1 para ouvir solicitacoes, outro para o cliente
-
+	int listen_fd; // dois file descriptors, 1 para ouvir solicitacoes, outro para o cliente
+    
+    
 	struct sockaddr_in server_addr; // struct com informacoes para o server socket
 	struct sockaddr_in client_addr; // struct que armazenara informacoes do cliente conectado
 
@@ -46,8 +47,9 @@ int main(int argc, char ** argv) {
 	printf("Inicilizando bate-papo %s na porta %d...\n", server_name, server_port);
 
 	while (1) {
-		client_fd = accept(listen_fd, (struct sockaddr*) NULL, NULL); // funcao bloqueante, gera novo socket 
-		pthread_create(&threads[thread_count++], NULL, (void*) responde_cliente, (void*) client_fd);
+        int i = 0;
+		client_fd[i] = accept(listen_fd, (struct sockaddr*) NULL, NULL); // funcao bloqueante, gera novo socket 
+		pthread_create(&threads[thread_count++], NULL, (void*) responde_cliente, (void*) client_fd[i++]);
 	}
 
 	return 0;
@@ -55,21 +57,25 @@ int main(int argc, char ** argv) {
 
 void* responde_cliente(void* param) {
 
-	int client_fd = (int) param;
+	int client_fdl = (int) param;
 
 	char msg[140];
-    
     char client_name[40];
-    read(client_fd, msg, 40);
-    write(client_fd, server_name, strlen(server_name)+1);
-    printf("%s\n", inet_ntoa(client_addr.sin_addr));
+    int x = 0;
+    
+    read(client_fdl, msg, 40);
+    write(client_fdl, server_name, strlen(server_name)+1);
+    
     
 	
 	while(1) {
 		bzero(msg, 140); // inicializa a mensagem com 0
-        read(client_fd, msg, 140); // le mensagem do socket cliente associado
+        read(client_fdl, msg, 140); // le mensagem do socket cliente associado
         printf("%s\n",msg); // exibe o que recebeu do cliente
-        write(client_fd, msg, strlen(msg)+1); // envia de volta a mesma mensgem
         
+        for(x = 0 ; x < 10; x++)
+        {
+            write(client_fd[x], msg, strlen(msg)+1); // envia de volta a mesma mensgem
+        }
 	}
 }

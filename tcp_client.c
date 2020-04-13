@@ -18,7 +18,7 @@ int main(int argc, char** argv) {
 
 	char msg[100]; // msg digitada pelo cliente
 	char send_msg[140]; // msg do cliente junto com o nome para envio
-	char recv_msg[100]; // string com mensagem a receber
+	char recv_msg[100]; // string com mensagem a recebe
 
 	struct sockaddr_in server_addr; // struct com informacoes do servidor a conectar
 
@@ -36,7 +36,6 @@ int main(int argc, char** argv) {
     
     bzero( send_msg, 140);
     bzero( recv_msg, 100);
-    strcpy(send_msg, client_name);
     write(client_fd, send_msg, strlen(send_msg)+1);
     printf("Apelido: %s\n", client_name);
     read(client_fd, recv_msg, 140);
